@@ -24,25 +24,26 @@ class _SecondPageState extends State<SecondPage> {
   int selectedIdx = -1;
 
   VehicleRouteService vehicleRouteService = VehicleRouteService();
-
+  String btnText = "Find Vehicle Route";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Second Page'),
-      ),
       floatingActionButton: selectedIdx == -1
           ? null
           : MaterialButton(
               textColor: Colors.white,
               color: Colors.deepPurple,
               onPressed: () async {
+                setState(() {
+                  btnText = "Finding...";
+                });
                 debugPrint("Find Vehicle Route Button Pressed");
-                 VehicleResult selectedVehicleResult =
+                VehicleResult selectedVehicleResult =
                     vehicleResults[selectedIdx];
-                vehicleResults.removeAt(selectedIdx);
-                 VehicleRoute vehicleRoute = await vehicleRouteService
-                    .fetchVehicleRoute(selectedVehicleResult, vehicleResults);
+                List<VehicleResult> otherVehicles = List.from(vehicleResults);
+                otherVehicles.removeAt(selectedIdx);
+                VehicleRoute vehicleRoute = await vehicleRouteService
+                    .fetchVehicleRoute(selectedVehicleResult, otherVehicles);
                 debugPrint(
                   "Vehicle Route: ${vehicleRoute.toString()}",
                 );
@@ -54,7 +55,7 @@ class _SecondPageState extends State<SecondPage> {
                   ),
                 );
               },
-              child: Text("Find Vehicle Route"),
+              child: Text(btnText),
             ),
       body: Scrollbar(
         controller: _scrollController,

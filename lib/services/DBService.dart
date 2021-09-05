@@ -6,6 +6,7 @@ import "../models/VehicleResult.dart";
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:core';
+import 'package:flutter/material.dart';
 
 class DBService {
   static const String _dbBaseURL =
@@ -21,25 +22,11 @@ class DBService {
     debugPrint("==========================");
     debugPrint(vehicleResultsJSON.count.toString());
 
-    // var vehicleResultsJSON = [
-    //     {
-    //       "Time": {"hour": 1, "minute": 20, "second": 3},
-    //       "Date": {"year": 2021, "monthValue":1, "dayOfMonth": 1},
-    //       "Latitude": "19.025684",
-    //       "Longitude": "72.840797",
-    //       "Color": "GREY"
-    //       "imageUrl": "https://avatars.githubusercontent.com/u/34369843?v=4",
-    //       "featureVectorPath": "feature_vectors/2021/9/3/11/123456.pickle"
-    //  }
-    //   ];
 
     List<VehicleResult> vehicleResults = [];
     int idx = 0;
-    // debugPrint(vehicleResultsJSON.data.runtimeType.toString());
-    // debugPrint(vehicleResultsJSON.data![0].runtimeType.toString());
     var v = vehicleResultsJSON.data![0] as Map<String, dynamic>;
-    // debugPrint(v.runtimeType.toString());
-    // debugPrint(v.toString());
+
     var vehicles = [];
     for (var vehicle in vehicleResultsJSON.data!) {
       vehicles.add(vehicle as Map<String, dynamic>);
@@ -47,16 +34,14 @@ class DBService {
     // debugPrint(vehicles.toString());
     debugPrint("=================================");
     for (Map<String, dynamic> vehicle in vehicles) {
-      // debugPrint(vehicle.runtimeType.toString());
+
       vehicle["id"] = idx;
-      // vehicle["vehicleInfo"] =   json.decode('{"Color": ${vehicle['Color']}}');
+
       vehicle["vehicleInfo"] = {
         "Color": vehicle["Color"],
         "Type": vehicle["Type"],
       };
-      // debugPrint(vehicle.toString());
 
-      // debugPrint(vehicle.keys.toString());
       vehicleResults
           .add(VehicleResult.fromJson(vehicle as Map<String, dynamic>));
       idx += 1;
@@ -88,45 +73,13 @@ class DBService {
   }
 
   Uri constructURIForSingleDate(VehicleQuery vehicleQuery) {
-    /*
-      One date selected (endDate is null)
-      SELECT * FROM test.sample_data
-      WHERE "Date" = vehicleQuery.startDate 
-            AND "Time" >= vehicleQuery.startTime
-            AND "Time" <=  vehicleQuery.endTime;
-      
-      Two dates selected with difference between dates being 1
-      SELECT * FROM test.sample_data
-      WHERE ( "Date" = vehicleQuery.startDate 
-              AND "Time" >= vehicleQuery.startTime
-            ) 
-            OR
-            ( "Date" = vehicleQuery.endDate 
-              AND "Time" <= vehicleQuery.endTime
-            ) 
-
-      Two dates selected with difference between dates being more than 1
-      SELECT * FROM test.sample_data
-      WHERE ( "Date" = startDate 
-              AND "Time" >= startTime
-            )
-            OR
-            "Date" IN [startDate+1 ... endDate-1]
-            OR
-            ( "Date" = endDate 
-              AND "Time" <= endTime
-            ) ;
-    */
-
+  
     Map<String, dynamic> query = {
       "Date": {"\$eq": vehicleQuery.startDate},
       "Time": {"\$gte": vehicleQuery.startTime, "\$lte": vehicleQuery.endTime}
     };
 
     query = addFilteringConditions(query, vehicleQuery);
-
-    //final uri = Uri(_dbBaseURL, _tableAPIEndpoint, queryParameters);
-    //final uri = Uri(_dbBaseURL, _tableAPIEndpoint, queryParameters);
     final uri = Uri.parse(
         'https://${_dbBaseURL}${getAPIEndpoint(vehicleQuery)}?where=${json.encode(query).toString()}&fields=Date,Time,ImageUrl,Latitude,Longitude');
     return uri;
@@ -222,11 +175,6 @@ class DBService {
       return Holder(count: count, data: data);
     }
 
-    // debugPrint(response.body['data']);
-    // debugPrint(json.decode(response.body.toString()));
-    // print(response.body.runtimeType);
-    // print(response.body["data"].runtimeType);
-    return Future.value(Holder(count: 1, data: [{}]));
   }
 
   List<DateTime> getDaysInBeteween(DateTime startDate, DateTime endDate) {

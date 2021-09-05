@@ -657,47 +657,7 @@ class _LandingPageState extends State<LandingPage> {
           MaterialButton(
             onPressed: () async {
               final service = QueryVehiclesService();
-              if (_fromSelectedDate != null &&
-                  _toDate != null &&
-                  _fromSelectedTimeOfDay != null &&
-                  _toTimeOfDay != null &&
-                  _vehicleColor != null) {
-                final String fromFormattedDate =
-                    DateFormat('yyyy-MM-dd').format(_fromSelectedDate!);
-                final String toFormattedDate =
-                    DateFormat('yyyy-MM-dd').format(_toDate!);
-                String fromTime =
-                    "${_fromSelectedTimeOfDay?.hour.toString().padLeft(2, '0')}"
-                    ":"
-                    "${_fromSelectedTimeOfDay?.minute.toString().padLeft(2, '0')}";
-                String toTime =
-                    "${_toTimeOfDay?.hour.toString().padLeft(2, '0')}"
-                    ":"
-                    "${_toTimeOfDay?.minute.toString().padLeft(2, '0')}";
-
-                List<VehicleResult> results = await service.findVehicles(
-                  VehicleQuery(
-                    startDate: fromFormattedDate, //2021-09-03
-                    //startDate: "2021-01-01",
-                    startTime: fromTime,
-                    //startTime: "00:00:00",
-                    vehicleInfo: VehicleInfo(
-                      color: _vehicleColor!,
-                      //color: "Grey",
-                      type: _vehicleType!,
-                      //type: "Truck",
-                    ),
-                    endTime: toTime,
-                    //endTime: "02:00:00",
-                    endDate: toFormattedDate,
-                    //endDate: "2021-01-01",
-                    radius: 1,
-                    latitude: 0.642864,
-                    longitude: -35.458403,
-                  ),
-                );
-                debugPrint('Result: $results');
-              } else {
+              
                 List<VehicleResult> results = await service.findVehicles(
                   VehicleQuery(
                     // startDate: fromDate, //2021-09-03
@@ -725,7 +685,6 @@ class _LandingPageState extends State<LandingPage> {
                     builder: (_) => SecondPage(results: results),
                   ),
                 );
-              }
             },
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(6),

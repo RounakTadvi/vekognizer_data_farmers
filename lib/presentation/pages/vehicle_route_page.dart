@@ -23,7 +23,6 @@ class _VehicleRoutePageState extends State<VehicleRoutePage> {
   late GoogleMapController _mapController;
   Set<Marker> _markers = {};
   Set<Polyline> _polylines = {};
-  // List<Marker> customMarkers = [];
 
   void _showPos() async {
     List<LatLng> points = [];
@@ -77,7 +76,7 @@ class _VehicleRoutePageState extends State<VehicleRoutePage> {
               route.vehicleResults![0].latitude,
               route.vehicleResults![0].longitude,
             ),
-            zoom: 5),
+            zoom: 15),
         onMapCreated: (GoogleMapController controller) {
           _mapController = controller;
         },
