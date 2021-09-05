@@ -8,8 +8,8 @@ from collections import OrderedDict
 import numpy as np
 from scipy.stats import itemfreq
 import cv2
-import math
 import warnings
+from model.car_type_detector import CarTypeDetector
 warnings.filterwarnings("ignore")
 
 from data_saver import DataSaver
@@ -24,6 +24,7 @@ class VideoReader:
         self.path = path
         self.data_saver = DataSaver()
         self.background=cv2.createBackgroundSubtractorMOG2()
+        self.carTypeDetector = CarTypeDetector()
 
         colors = OrderedDict({"red": (255, 0, 0),"green": (0, 255, 0),"blue": (0,0, 255),"white":(255,255,255),"black":(100,100,100)})
         lab = np.zeros((len(colors), 1, 3), dtype="uint8")
@@ -33,7 +34,7 @@ class VideoReader:
         for (i, (name, rgb)) in enumerate(colors.items()):
                     # update the L*a*b* array and the color names list
                     lab[i] = rgb
-                    colorNames.append(name)
+                    self.colorNames.append(name)
         self.lab = cv2.cvtColor(lab, cv2.COLOR_RGB2LAB)
 
 
@@ -142,9 +143,10 @@ class VideoReader:
                 # Cropped Vehicle
                 cropped_vehicle = frame_copy[y1:y2, x1:x2]
 
+                detectedCars, feature_vector = self.carTypeDetector.detection([frame_copy])
 
                 # Save vehicle
-                self.data_saver.save_vehicle(color, type, cropped_vehicle, feature_vector)
+                self.data_saver.save_vehicle(color, detectedCars[0].carType, cropped_vehicle, feature_vector[0])
                 
 
                 if(cv2.waitKey(30)==27 & 0xff):
@@ -233,4 +235,4 @@ class VideoReader:
         return (cx, cy)
 
 if __name__ == "__main__":
-    self.data_reader = VideoReader("pos_a.mp4")
+    data_reader = VideoReader("pos_a.mp4")
